@@ -9,7 +9,7 @@ CMIDE Bridge connects [CMIDE](https://github.com/CodeMarketModding/CMIDE) and [C
 
 ## Install
 
-1. Install BepInEx 5 in the game directory and launch the game once so BepInEx creates its folders. The game directory should contain both `Code Market_Data` and `BepInEx/core`.
+1. Install [BepInEx 5](https://github.com/bepinex/bepinex/releases) in the game directory and launch the game once so BepInEx creates its folders. The game directory should contain both `Code Market_Data` and `BepInEx/core`.
 2. Download `CMIDE-Bridge.dll` from [Releases](https://github.com/CodeMarketModding/CMIDE-Bridge/releases/latest).
 3. Close the game. Create `BepInEx/plugins/CodeMarketLiveIDE` in the game directory if necessary, then copy the downloaded DLL into it. Remove older copies of the CMIDE bridge DLL from the plugins directory to avoid duplicate versions.
 4. Start Code Market and load a world, then open CMIDE. BepInEx should report `Code Market Live IDE Bridge 1.0.9` in its log.
