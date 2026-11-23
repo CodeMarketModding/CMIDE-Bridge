@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CodeMarket.LiveIDE
 {
-    [BepInPlugin("local.codemarket.liveide", "Code Market Live IDE Bridge", "1.0.9")]
+    [BepInPlugin("local.codemarket.liveide", "Code Market Live IDE Bridge", "1.0.11")]
     public sealed class Bridge : BaseUnityPlugin
     {
         private string folder;
@@ -51,13 +51,19 @@ namespace CodeMarket.LiveIDE
                 return new Response { ok=false, error="Open a game world first.", session=session };
             var project = app.Workspace.Project;
             var r = new Response { ok=true, session=session, world=app.CurrentWorld, language=CodeText.Key(CodeText.Current) };
-            if (req.command == "list") { FileOperations.FillProject(r, project); return r; }
+            if (req.command == "list") {
+                r.canDeleteFolders = true;
+                FileOperations.FillProject(r, project);
+                return r;
+            }
             if (req.session != session || req.world != app.CurrentWorld)
                 return new Response { ok=false, error="The game session or world changed. Reconnect before editing.", session=session, world=app.CurrentWorld };
             if (req.command == "referenceIndex") return ReferenceOperations.Index(r, app);
             if (req.command == "referencePage") return ReferenceOperations.Page(req, r, app);
             if (req.command == "create") return FileOperations.Create(req, r, project);
             if (req.command == "createFolder") return FileOperations.CreateFolder(req, r, project);
+            if (req.command == "previewFolderDeletion" || req.command == "deleteFolder")
+                return FileOperations.DeleteFolder(req, r, app.Workspace);
             var codeFile = project.Files.FirstOrDefault(f => f.Path == req.path);
             if (codeFile == null) { r.ok=false; r.error="Script no longer exists. Refresh the file list."; return r; }
             if (req.command == "rename") return FileOperations.Rename(req, r, project, codeFile);

@@ -1,5 +1,8 @@
 using System;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using JavaMarket.App;
 using JavaMarket.UI;
 
@@ -62,6 +65,49 @@ namespace CodeMarket.LiveIDE
             workspace.Delete(file);
             FillProject(response, workspace.Project);return response;
         }
+        public static Response DeleteFolder(Request request, Response response, CodeWorkspace workspace)
+        {
+            var project = workspace.Project;
+            var folder = project.Folders.FirstOrDefault(node => node != project.Root && node.Path == request.path);
+            if (folder == null) return Error(response, "That folder no longer exists. Refresh the Explorer.");
+
+            var folders = project.Folders.Where(node => node.IsWithin(folder)).OrderBy(node => node.Path, StringComparer.Ordinal).ToArray();
+            var files = project.Files.Where(file => file.IsWithin(folder)).OrderBy(file => file.Path, StringComparer.Ordinal).ToArray();
+            var snapshot = FolderSnapshot(folders, files);
+            if (request.command == "previewFolderDeletion")
+            {
+                response.folders = folders.Select(node => node.Path).ToArray();
+                response.files = files.Select(file => file.Path).ToArray();
+                response.folderSnapshot = snapshot;
+                return response;
+            }
+
+            if (request.expected != snapshot)
+                return Error(response, "The folder or its contents changed. Review the folder and confirm deletion again.");
+
+            workspace.DeleteFolder(folder);
+            FillProject(response, project);
+            return response;
+        }
+
+        private static string FolderSnapshot(CodeFolder[] folders, CodeFile[] files)
+        {
+            using var data = new MemoryStream();
+            using var writer = new BinaryWriter(data, Encoding.UTF8, leaveOpen: true);
+            writer.Write(folders.Length);
+            foreach (var folder in folders) writer.Write(folder.Path);
+            writer.Write(files.Length);
+            foreach (var file in files)
+            {
+                writer.Write(file.Path);
+                writer.Write(file.Text ?? "");
+            }
+            writer.Flush();
+            data.Position = 0;
+            using var hash = SHA256.Create();
+            return Convert.ToBase64String(hash.ComputeHash(data));
+        }
+
         public static Response Move(Request request, Response response, CodeProject project, CodeFile file)
         {
             if (Changed(request,file)) return Error(response, "The script changed in the game. Reload before moving.");
