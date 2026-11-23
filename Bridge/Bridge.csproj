@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><LangVersion>latest</LangVersion><AssemblyName>CodeMarket.LiveIDE.HiddenFolders</AssemblyName><GenerateAssemblyInfo>false</GenerateAssemblyInfo><BepCore Condition="'$(BepCore)' == '' and '$(GameRoot)' != ''">$(GameRoot)\BepInEx\core</BepCore><GameManaged Condition="'$(GameManaged)' == '' and '$(GameRoot)' != ''">$(GameRoot)\Code Market_Data\Managed</GameManaged></PropertyGroup>
+  <PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><LangVersion>latest</LangVersion><AssemblyName>CMIDE-Bridge</AssemblyName><GenerateAssemblyInfo>false</GenerateAssemblyInfo><BepCore Condition="'$(BepCore)' == '' and '$(GameRoot)' != ''">$(GameRoot)\BepInEx\core</BepCore><GameManaged Condition="'$(GameManaged)' == '' and '$(GameRoot)' != ''">$(GameRoot)\Code Market_Data\Managed</GameManaged></PropertyGroup>
   <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences" Condition="!Exists('$(BepCore)\BepInEx.dll') Or !Exists('$(GameManaged)\JavaMarket.dll')">
     <Error Text="Set GameRoot to your Code Market installation with BepInEx installed, or set both BepCore and GameManaged." />
   </Target>

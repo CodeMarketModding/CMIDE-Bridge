@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace CodeMarket.LiveIDE
 {
-    [BepInPlugin("local.codemarket.liveide", "Code Market Live IDE Bridge", "1.0.7")]
+    [BepInPlugin("local.codemarket.liveide", "Code Market Live IDE Bridge", "1.0.9")]
     public sealed class Bridge : BaseUnityPlugin
     {
         private string folder;
@@ -61,6 +61,7 @@ namespace CodeMarket.LiveIDE
             var codeFile = project.Files.FirstOrDefault(f => f.Path == req.path);
             if (codeFile == null) { r.ok=false; r.error="Script no longer exists. Refresh the file list."; return r; }
             if (req.command == "rename") return FileOperations.Rename(req, r, project, codeFile);
+            if (req.command == "move") return FileOperations.Move(req, r, project, codeFile);
             if (req.command == "delete") return FileOperations.Delete(req, r, app.Workspace, codeFile);
             if (req.command == "read") { r.text=codeFile.Text; return r; }
             if (req.command == "write") {

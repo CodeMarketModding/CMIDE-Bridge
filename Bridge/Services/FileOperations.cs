@@ -62,5 +62,16 @@ namespace CodeMarket.LiveIDE
             workspace.Delete(file);
             FillProject(response, workspace.Project);return response;
         }
+        public static Response Move(Request request, Response response, CodeProject project, CodeFile file)
+        {
+            if (Changed(request,file)) return Error(response, "The script changed in the game. Reload before moving.");
+            string folderPath = request.name ?? "";
+            CodeFolder target = folderPath.Length == 0 ? project.Root : project.Folders.FirstOrDefault(x => x.Path == folderPath);
+            if (target == null) return Error(response, "That destination folder no longer exists. Refresh the Explorer.");
+            if (file.Parent == target) { response.path=file.Path;response.text=file.Text;FillProject(response,project);return response; }
+            if (target.Children.Any(x => string.Equals(x.Name,file.Name,StringComparison.OrdinalIgnoreCase))) return Error(response, "A file or folder with that name already exists in the destination.");
+            if (!project.Move(file,target)) return Error(response, "The game could not move that script.");
+            response.path=file.Path;response.text=file.Text;FillProject(response,project);return response;
+        }
     }
 }
